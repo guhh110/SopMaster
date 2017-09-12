@@ -88,7 +88,7 @@
         app:bsb_section_count="4"
         app:bsb_section_text_position="below_section_mark"
         app:bsb_touch_to_seek="true"
-        app:bsb_show_progress_in_float="false"
+        app:bsb_show_progress_in_float="true"
         app:bsb_show_section_mark="true"
         app:bsb_show_section_text="true"
         app:bsb_show_thumb_text="true"

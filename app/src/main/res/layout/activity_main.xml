@@ -20,6 +20,7 @@
         layout="@layout/giraffe_player"/>
 
     <TextView
+        android:visibility="gone"
         android:clickable="true"
         android:gravity="center"
         android:textSize="28sp"

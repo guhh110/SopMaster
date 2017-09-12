@@ -1,19 +1,26 @@
 package com.guhh.sopmaster;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Config;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,7 +37,15 @@ import com.danikula.videocache.HttpProxyCacheServer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.net.ssl.ManagerFactoryParameters;
+
 import entity.FilesEntity;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
 import service.BackgroundUpdateFilesService;
 import tcking.github.com.giraffeplayer.GiraffePlayer;
 import tcking.github.com.giraffeplayer.GiraffePlayerActivity;
@@ -40,6 +55,7 @@ import util.UserData;
 import util.Util;
 import dialog.SettingDialog;
 
+@RuntimePermissions
 public class MainActivity extends AppCompatActivity {
     private Util util;
 
@@ -88,8 +104,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         util = new Util(getBaseContext());
-        hideBottomUIMenu();//全屏
+//        hideBottomUIMenu();//全屏
         iniView();
         iniPlayer();//初始化播放器
 
@@ -122,7 +139,9 @@ public class MainActivity extends AppCompatActivity {
                         stopBannerPlay();//停止轮播
                         hideBannerShowVideoView();//隐藏banner
                         String video_url = getVideoUrl(UserData.filesEntities.get(position).getWocUrl());
-                        startVideoPlay(video_url);//开始播放视频
+                        //申请权限
+                        MainActivityPermissionsDispatcher.startVideoPlayWithCheck(MainActivity.this,video_url);
+//                        startVideoPlay(video_url);//开始播放视频
 
                     }else{//当前item为图片
                         pause_ib.setVisibility(View.GONE);//隐藏暂停按钮
@@ -145,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
             banner.setCanLoop(false);
         }else if(pages.size() == 0){
             showNoPageView();
+            Toast.makeText(getBaseContext(),"167",Toast.LENGTH_SHORT).show();
         }
         banner.setScrollDuration(500);
         startBannerPlay();
@@ -323,6 +343,57 @@ public class MainActivity extends AppCompatActivity {
 //        showOrHideControl();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+     void showRequestPermissionTip(final PermissionRequest request){
+        new AlertDialog.Builder(this)
+                .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        request.proceed();
+                    }
+                })
+                .setNegativeButton("不给", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        request.cancel();
+                    }
+                })
+                .setCancelable(false)
+                .setMessage("视频和图片缓存需要写入权限")
+                .show();
+    }
+
+    @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+     void showPermissionDeniedTip(){
+        Toast.makeText(getBaseContext(),"拒绝写入权限视频和图片将无法缓存",Toast.LENGTH_SHORT).show();
+    }
+    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+     void showPermissionNeverAsk(){
+        new AlertDialog.Builder(this)
+                .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setCancelable(false)
+                .setMessage("您已经禁止了写入权限,是否现在去开启")
+                .show();
+    }
+
     private void iniPlayer(){
         //播放器设置
         if(videoPlayer == null)
@@ -343,7 +414,9 @@ public class MainActivity extends AppCompatActivity {
             public void run() {//播放完成，下一首
                 if(UserData.filesEntities.size() == 1){//如果只有一个文件
                     String video_url = getVideoUrl(UserData.filesEntities.get(0).getWocUrl());
-                    startVideoPlay(video_url);//开始播放视频
+                    //申请权限
+                    MainActivityPermissionsDispatcher.startVideoPlayWithCheck(MainActivity.this,video_url);
+//                    startVideoPlay(video_url);//开始播放视频
                 }else{
                     showBannerHideVideoView();//显示banner
                     startBannerPlay();//开始轮播
@@ -388,6 +461,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //开始播放视频
+    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)//动态申请权限
+    void startVideoPlay(String url){
+        Toast.makeText(getBaseContext(),url,Toast.LENGTH_SHORT).show();
+        if(videoPlayer!=null){
+            if(videoPlayer.isPlaying()){
+                videoPlayer.stop();
+            }
+            videoPlayer.play(url);
+        }
+    }
+
     //停止播放视频
     private void stopVideoPlay(){
         if(videoPlayer!=null){
@@ -409,15 +494,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //开始播放视频
-    private void startVideoPlay(String url){
-        if(videoPlayer!=null){
-            if(videoPlayer.isPlaying()){
-                videoPlayer.stop();
-            }
-            videoPlayer.play(url);
-        }
-    }
+
 
     //下一个
     private void bannerToNext(){
@@ -591,6 +668,7 @@ public class MainActivity extends AppCompatActivity {
             banner.getOnPageChangeListener().onPageSelected(0);//触发onPageSelected
         }else if(pages.size() == 0){
             showNoPageView();
+            Toast.makeText(getBaseContext(),"671",Toast.LENGTH_SHORT).show();
             pageNumber_tv.setText("0/0");//更新页码指示器
         }
 
@@ -643,6 +721,11 @@ public class MainActivity extends AppCompatActivity {
             int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(uiOptions);
+
+            WindowManager.LayoutParams lp = getWindow().getAttributes();
+            lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            getWindow().setAttributes(lp);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         }
     }
 
