@@ -41,10 +41,9 @@ import util.Util;
 import dialog.SettingDialog;
 
 public class MainActivity extends AppCompatActivity {
-    private Util util = new Util(getBaseContext());
+    private Util util;
 
     private static String TAG = "MainActivity";
-    private boolean isBannerPlay = true;
 
     private MyBroadCastReceiver myBroadCastReceiver;
 
@@ -89,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        util = new Util(getBaseContext());
         hideBottomUIMenu();//全屏
         iniView();
         iniPlayer();//初始化播放器
@@ -147,15 +147,13 @@ public class MainActivity extends AppCompatActivity {
             showNoPageView();
         }
         banner.setScrollDuration(500);
-        if(isBannerPlay)
-            startBannerPlay();
+        startBannerPlay();
 
         prev_ib.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isBannerPlay){//重置切换页的冷却时间
-                    startBannerPlay();
-                }
+                //重置切换页的冷却时间
+                startBannerPlay();
                 bannerToPrev();
             }
         });
@@ -163,9 +161,8 @@ public class MainActivity extends AppCompatActivity {
         next_ib.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isBannerPlay){//重置切换页的冷却时间
-                    startBannerPlay();
-                }
+                //重置切换页的冷却时间
+                startBannerPlay();
                 bannerToNext();
             }
         });
@@ -236,12 +233,14 @@ public class MainActivity extends AppCompatActivity {
         more_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(settingDialog == null){
                     settingDialog = SettingDialog.show(MainActivity.this,true);
-                }else {
-                    settingDialog.show();
-                }
+            }
+        });
 
+        noPage_tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showOrHideAndDelayHideCtrl();
             }
         });
     }
@@ -260,6 +259,8 @@ public class MainActivity extends AppCompatActivity {
         }
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(UserData.NEW_FILE_ACTION);
+        intentFilter.addAction(UserData.CONNECT_SERVER_SUCCESS_ACTION);
+        intentFilter.addAction(UserData.PAGE_CHANGE_DELAY_CHANGED);
         registerReceiver(myBroadCastReceiver,intentFilter);
 
         //恢复视频播放
@@ -302,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
         stopVideoPlay();
 
         //清除数据
-//        UserData.clear();
+        UserData.clear();
 
         //停止轮播
         banner.stopTurning();
@@ -331,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
         videoPlayer.onControlPanelVisibilityChange(new GiraffePlayer.OnControlPanelVisibilityChangeListener() {
             @Override
             public void change(boolean isShowing) {
-                if(UserData.filesEntities!=null && UserData.filesEntities.get(banner.getCurrentItem()).isMp4()) {//当前轮播item为视频
+                if(UserData.filesEntities!=null && UserData.filesEntities.size()>0 && UserData.filesEntities.get(banner.getCurrentItem()).isMp4()) {//当前轮播item为视频
                     isControlShowing = isShowing;
                     showOrHideControl(isShowing);//控制栏的显示和隐藏
                 }
@@ -377,7 +378,13 @@ public class MainActivity extends AppCompatActivity {
     //开始轮播
     private void startBannerPlay(){
         if(banner!=null){
-            banner.startTurning(UserData.changePageDelay * 1000);
+            int delay = util.getPageChangeDelay();
+            Log.i(TAG,delay+"+delay");
+            if(delay>0){
+                banner.startTurning(delay*1000);
+            }else{
+                stopBannerPlay();
+            }
         }
     }
 
@@ -554,12 +561,18 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG,intent.getAction());
-            if(intent.getAction().equals(UserData.NEW_FILE_ACTION)){//有新文件
+            String action = intent.getAction();
+            Log.i(TAG,action);
+            if(action.equals(UserData.NEW_FILE_ACTION)){//有新文件
                 //不管是否有在播放视频都停止播放视频 并 显示 banner  因为当视频在加载的时候更新文件的时候检查不到状态
                 stopVideoPlay();
                 showBannerHideVideoView();
                 updatePages();//更新viewpager
+            }else if(action.equals(UserData.CONNECT_SERVER_SUCCESS_ACTION)){//后台service连接服务器成功
+                Toast.makeText(getBaseContext(),"连接服务器成功",Toast.LENGTH_SHORT).show();
+
+            }else if(action.equals(UserData.PAGE_CHANGE_DELAY_CHANGED)){//更改轮换时间
+                startBannerPlay();//重新设置轮换时间
             }
         }
     }
@@ -572,7 +585,6 @@ public class MainActivity extends AppCompatActivity {
                 return new ImageViewHolder();
             }
         },pages);
-        isBannerPlay = true;//重置变量
         startBannerPlay();//开始轮播
 
         if(pages.size()>0){
@@ -595,24 +607,15 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public View createView(Context context) {
-            Log.i(TAG,"createView");
             view = new PhotoView(context);
             view.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
                 @Override
                 public void onPhotoTap(View view, float x, float y) {
-                    isControlShowing = !isControlShowing;
-                    showOrHideControl(isControlShowing);
-                    if(handler_showOrHideCtrl!=null)
-                        handler_showOrHideCtrl.removeCallbacks(runnable_showOrHideCtrl);
-                    handler_showOrHideCtrl.postDelayed(runnable_showOrHideCtrl,5000);
+                    showOrHideAndDelayHideCtrl();
                 }
                 @Override
                 public void onOutsidePhotoTap() {
-                    isControlShowing = !isControlShowing;
-                    showOrHideControl(isControlShowing);
-                    if(handler_showOrHideCtrl!=null)
-                        handler_showOrHideCtrl.removeCallbacks(runnable_showOrHideCtrl);
-                    handler_showOrHideCtrl.postDelayed(runnable_showOrHideCtrl,5000);
+                    showOrHideAndDelayHideCtrl();
                 }
             });
 //            view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
@@ -640,6 +643,18 @@ public class MainActivity extends AppCompatActivity {
             int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(uiOptions);
+        }
+    }
+
+    private void showOrHideAndDelayHideCtrl(){
+        isControlShowing = !isControlShowing;//改变控制栏的状态
+        showOrHideControl(isControlShowing);//根据传入参数显示或者隐藏控制栏
+
+        if(handler_showOrHideCtrl!=null)//如果延时操作handler不为空 先删除先前添加的延时操作
+            handler_showOrHideCtrl.removeCallbacks(runnable_showOrHideCtrl);
+
+        if(isControlShowing){//如果控制栏当前为显示状态
+            handler_showOrHideCtrl.postDelayed(runnable_showOrHideCtrl,5000);//添加一个5秒之后隐藏控制栏的操作
         }
     }
 }

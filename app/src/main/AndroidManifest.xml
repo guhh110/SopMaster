@@ -17,6 +17,7 @@
         android:name=".App"
         >
         <activity android:name=".MainActivity"
+            android:configChanges="screenSize|keyboardHidden|keyboard|orientation|screenLayout"
             android:screenOrientation="landscape"
             >
 

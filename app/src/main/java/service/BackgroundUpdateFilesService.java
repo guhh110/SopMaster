@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -38,7 +39,7 @@ public class BackgroundUpdateFilesService extends Service {
     private ScheduledExecutorService singleThreadPool;
     private GetFilesUrlRunnable getFilesUrlRunnable;
 
-    private Util util = new Util();
+    private Util util;
     public BackgroundUpdateFilesService() {
 
     }
@@ -51,13 +52,15 @@ public class BackgroundUpdateFilesService extends Service {
 
     @Override
     public void onCreate() {
+        if(util == null)
+            util = new Util(getBaseContext());
         Log.i(TAG,"onCreate");
         //初始化线程池
         if(singleThreadPool != null){
             singleThreadPool.shutdownNow();
             singleThreadPool = null;
         }
-        singleThreadPool = Executors.newScheduledThreadPool(1);
+        singleThreadPool = Executors.newSingleThreadScheduledExecutor();
 
         //初始化定时执行的Runnable
         if(getFilesUrlRunnable==null)
@@ -71,13 +74,13 @@ public class BackgroundUpdateFilesService extends Service {
     public void onDestroy() {
         isRunning = false;
         Log.i(TAG,"onDestroy");
-        super.onDestroy();
         if(singleThreadPool!=null){
             List<Runnable> a = singleThreadPool.shutdownNow();
             Log.i(TAG, a.size()+"-");
             singleThreadPool = null;
         }
         closeSocket();
+        super.onDestroy();
     }
 
     private void closeSocket(){
@@ -98,13 +101,16 @@ public class BackgroundUpdateFilesService extends Service {
     }
 
     private void connectSocket(){
-
         try {
             Log.i(TAG,"连接socket");
             InetSocketAddress socketAddress = new InetSocketAddress(UserData.ip,UserData.port);
             socket = new Socket();
             socket.connect(socketAddress,1000);//设置连接超时时间
             socket.setSoTimeout(10000);//设置读取数据超时时间
+
+            //连接服务器成功
+            Intent intent = new Intent(UserData.CONNECT_SERVER_SUCCESS_ACTION);
+            sendBroadcast(intent);
         } catch (Exception e) {
             e.printStackTrace();
             Log.i(TAG,"连接socket失败"+e.toString());
@@ -135,19 +141,16 @@ public class BackgroundUpdateFilesService extends Service {
                             String fileUrls = new String(Base64.decodeBase64(result_getFile_arr[2].getBytes()));
                             try {
                                 List<FilesEntity> entitys = JSON.parseArray(fileUrls, FilesEntity.class);
-                                if(UserData.filesEntities==null){//为空说明第一次获取到文件  直接更新
-                                    UserData.filesEntities = entitys;
-                                    Intent intent = new Intent(UserData.NEW_FILE_ACTION);
-                                    sendBroadcast(intent);
-                                }else{//不为空 比较文件顺序 和 文件个数
-                                    boolean isSample = UserData.filesEntities.equals(entitys);
-                                    if(!isSample){//不同 发送广播 让MainActivity更新文件
-                                        UserData.filesEntities = entitys;
+                                    boolean isSample = entitys.equals(UserData.filesEntities);
+                                    if(!isSample){//不同->发送广播->让MainActivity更新文件
+                                        //到这里说明文件url有效 并且是最新的  所以保存在本地  用于没有网络的时候显示
+                                        Log.i(TAG,fileUrls+"-===");
+                                        util.saveFileUrls(fileUrls);//保存到本地
+                                        UserData.filesEntities = entitys;//保存到全局变量
                                         Intent intent = new Intent(UserData.NEW_FILE_ACTION);
-                                        sendBroadcast(intent);
+                                        sendBroadcast(intent);//通知MainActivity更新文件
                                     }
                                     Log.i(TAG,isSample+"--");
-                                }
                             }catch (Exception e){
                                 e.printStackTrace();
                                 Log.i(TAG,e+"--");

@@ -12,12 +12,14 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.guhh.sopmaster.R;
+import com.xw.repo.BubbleSeekBar;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -25,17 +27,24 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import util.UserData;
+import util.Util;
+
 /**
  * Created by sunpn on 2017/9/5.
  */
 
 public class SettingDialog extends Dialog {
+    private Util util;
+
     private static String TAG = "SettingDialog";
     private TextView sysSet_tv;
     private TextView wifiSet_tv;
     private TextView netSet_tv;
     private TextView update_tv;
     private static Context context;
+
+    private BubbleSeekBar bubbleSeekBar;
 
     //更新软件相关
     private SearchFileDialog searchFileDialog;
@@ -65,10 +74,33 @@ public class SettingDialog extends Dialog {
      *
      */
     public void intView() {
+        int delay = util.getPageChangeDelay();
+        bubbleSeekBar = (BubbleSeekBar) findViewById(R.id.my_seekbar);
+        bubbleSeekBar.setProgress(delay);
+
         sysSet_tv = (TextView) findViewById(R.id.sysSet_tv);
         wifiSet_tv = (TextView) findViewById(R.id.wifiSet_tv);
         netSet_tv = (TextView) findViewById(R.id.netSet_tv);
         update_tv = (TextView) findViewById(R.id.updateSet_tv);
+
+        bubbleSeekBar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener() {
+            @Override
+            public void onProgressChanged(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+
+            }
+
+            @Override
+            public void getProgressOnActionUp(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+
+            }
+
+            @Override
+            public void getProgressOnFinally(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+                util.savePageChangeDelay(progress);//保存到本地
+                Intent intent = new Intent(UserData.PAGE_CHANGE_DELAY_CHANGED);
+                context.sendBroadcast(intent);//通知MainActivity 切换时间改变了
+            }
+        });
 
         sysSet_tv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,6 +208,7 @@ public class SettingDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG,"onCreate");
+        util = new Util(getContext());
         intView();
     }
 

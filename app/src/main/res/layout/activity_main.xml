@@ -20,12 +20,16 @@
         layout="@layout/giraffe_player"/>
 
     <TextView
+        android:clickable="true"
         android:gravity="center"
         android:textSize="28sp"
         android:id="@+id/noPage_tv"
         android:text="没有发布文档"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@+id/include"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <LinearLayout
         android:visibility="gone"

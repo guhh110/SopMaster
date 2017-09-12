@@ -1,7 +1,10 @@
 package util;
 
 import android.content.Context;
+import android.content.Entity;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.danikula.videocache.HttpProxyCacheServer;
@@ -17,6 +20,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -53,6 +57,7 @@ public class Util {
         return false;
     }
 
+    //保存登录信息
     public void saveLoginData(String ip,String port,String station){
         //保存到本地
         SharedPreferences.Editor editor = context.getSharedPreferences("loginData",Context.MODE_PRIVATE).edit();
@@ -60,13 +65,10 @@ public class Util {
         editor.putString("port",port);
         editor.putString("station",station);
         editor.apply();
-        //保存到全局变量
-        UserData.ip = ip;
-        UserData.port = Integer.parseInt(port);
-        UserData.station = station;
-        UserData.enCodeStation = new String(Base64.encodeBase64(station.getBytes()));//加密工站编号
+
     }
 
+    //获取本地保存的登录信息
     public HashMap<String,String> getLocalLoginData(){
         SharedPreferences sp = context.getSharedPreferences("loginData",Context.MODE_PRIVATE);
         HashMap<String,String> loginData = new HashMap<>();
@@ -77,6 +79,35 @@ public class Util {
         loginData.put("ip",ip);
         loginData.put("port",port);
         return loginData;
+    }
+
+
+    //保存最新的文件urk
+    public void saveFileUrls(String urls){
+        //保存到本地
+        SharedPreferences.Editor editor = context.getSharedPreferences("fileUrlsData",Context.MODE_PRIVATE).edit();
+        editor.putString("urls",urls);
+        editor.apply();
+    }
+
+    //获取最新的文件url
+    public String getFilUrls(){
+        SharedPreferences sp = context.getSharedPreferences("fileUrlsData",Context.MODE_PRIVATE);
+        return  sp.getString("urls","");
+    }
+
+    //保存图片轮换时间
+    public void savePageChangeDelay(int delay){
+        //保存到本地
+        SharedPreferences.Editor editor = context.getSharedPreferences("pageChangeDelay",Context.MODE_PRIVATE).edit();
+        editor.putInt("delay",delay);
+        editor.apply();
+    }
+
+    //获取图片轮换时间
+    public int getPageChangeDelay(){
+        SharedPreferences sp = context.getSharedPreferences("pageChangeDelay",Context.MODE_PRIVATE);
+        return  sp.getInt("delay",5);
     }
 
     public String sendCmdAndGetResult(String ip, int port, String cmd) throws IOException {
@@ -135,5 +166,14 @@ public class Util {
 
     public boolean isMP4(String url) {
         return url.endsWith("mp4")||url.endsWith("MP4");
+    }
+
+    public boolean isNetWorkConnect(){
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        if(networkInfo != null)
+            return networkInfo.isAvailable();
+
+        return false;
     }
 }
