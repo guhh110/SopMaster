@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/progress_custom_bg"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="3dp"
+    android:paddingBottom="3dp"
+
+    >
+<TextView
+    android:id="@+id/sysSet_tv"
+    android:textSize="16sp"
+    android:gravity="center"
+    android:padding="10dp"
+    android:textColor="#fff"
+    android:text="系统设置"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+    <TextView
+        android:background="#fff"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+    <TextView
+        android:id="@+id/wifiSet_tv"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textColor="#fff"
+        android:text="WIFI设置"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:background="#fff"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+    <TextView
+        android:id="@+id/netSet_tv"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textColor="#fff"
+        android:text="网络设置"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:background="#fff"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+    <TextView
+        android:id="@+id/updateSet_tv"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textColor="#fff"
+        android:text="更新软件"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
