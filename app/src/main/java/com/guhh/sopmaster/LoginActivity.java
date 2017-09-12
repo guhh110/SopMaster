@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                         List<FilesEntity> entitys = JSON.parseArray(fileUrls, FilesEntity.class);
                         UserData.filesEntities = entitys;
 
-                        //保存到全局变量
+                        //保存到全局变量asdfasd
                         UserData.ip = ip;
                         UserData.port = Integer.parseInt(port);
                         UserData.station = station;
