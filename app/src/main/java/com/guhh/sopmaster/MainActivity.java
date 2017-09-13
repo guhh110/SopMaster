@@ -159,12 +159,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         if(pages.size()>1){
+            pageNumber_tv.setText("1/"+pages.size());
             banner.setCanLoop(true);
         }else if(pages.size() == 1){
+            pageNumber_tv.setText("1/"+pages.size());
             banner.setCanLoop(false);
         }else if(pages.size() == 0){
+            pageNumber_tv.setText("0/0");
             showNoPageView();
-            Toast.makeText(getBaseContext(),"167",Toast.LENGTH_SHORT).show();
         }
         banner.setScrollDuration(500);
         startBannerPlay();
@@ -464,7 +466,8 @@ public class MainActivity extends AppCompatActivity {
     //开始播放视频
     @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)//动态申请权限
     void startVideoPlay(String url){
-        Toast.makeText(getBaseContext(),url,Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getBaseContext(),url,Toast.LENGTH_SHORT).show();
+        Log.i(TAG,url);
         if(videoPlayer!=null){
             if(videoPlayer.isPlaying()){
                 videoPlayer.stop();

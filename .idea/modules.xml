@@ -3,16 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AndroidVideoCache/AndroidVideoCache.iml" filepath="$PROJECT_DIR$/AndroidVideoCache/AndroidVideoCache.iml" />
-      <module fileurl="file://$PROJECT_DIR$/AndroidVideoCache/AndroidVideoCache.iml" filepath="$PROJECT_DIR$/AndroidVideoCache/AndroidVideoCache.iml" />
       <module fileurl="file://$PROJECT_DIR$/MyApplication3.iml" filepath="$PROJECT_DIR$/MyApplication3.iml" />
-      <module fileurl="file://$PROJECT_DIR$/SopMaster.iml" filepath="$PROJECT_DIR$/SopMaster.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/convenientbanner/convenientbanner.iml" filepath="$PROJECT_DIR$/convenientbanner/convenientbanner.iml" />
-      <module fileurl="file://$PROJECT_DIR$/convenientbanner/convenientbanner.iml" filepath="$PROJECT_DIR$/convenientbanner/convenientbanner.iml" />
       <module fileurl="file://$PROJECT_DIR$/giraffeplayer/giraffeplayer.iml" filepath="$PROJECT_DIR$/giraffeplayer/giraffeplayer.iml" />
-      <module fileurl="file://$PROJECT_DIR$/giraffeplayer/giraffeplayer.iml" filepath="$PROJECT_DIR$/giraffeplayer/giraffeplayer.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ijkplayer-java/ijkplayer-java.iml" filepath="$PROJECT_DIR$/ijkplayer-java/ijkplayer-java.iml" />
       <module fileurl="file://$PROJECT_DIR$/ijkplayer-java/ijkplayer-java.iml" filepath="$PROJECT_DIR$/ijkplayer-java/ijkplayer-java.iml" />
     </modules>
   </component>
