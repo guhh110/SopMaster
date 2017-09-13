@@ -244,9 +244,14 @@ public class SettingDialog extends Dialog {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.i(TAG,action);
             if(intent.getAction().equals(Intent.ACTION_MEDIA_MOUNTED)){
+                searchFileDialog.setMessage("已检测到U盘！");
                 String path = intent.getDataString();
+                Log.i(TAG,path+"--path");
                 String pathString = path.split("file://")[1] + "/";//U盘路径
+                Log.i(TAG,pathString+"--pathString");
                 File file = new File(pathString+"SopMaster.apk");
                 if(file.exists()){
                     Intent intent_openApk = getApkFileIntent(file);
@@ -255,10 +260,7 @@ public class SettingDialog extends Dialog {
                 }else{
                     searchFileDialog.setMessage("没有找到更新文件！");
                 }
-            }else{
-
             }
-            context.unregisterReceiver(udabcr);//反注册广播
         }
     }
 

@@ -70,6 +70,17 @@ public class LoginActivity extends AppCompatActivity {
                     port_et.requestFocus();
                 }else{//到这里说明用户输入的内容全部正确
 
+                    //保存登录数据到全局变量
+                    UserData.ip = ip_et.getText().toString().trim();
+                    UserData.port = Integer.parseInt(port_et.getText().toString());
+                    UserData.station = station_et.getText().toString().trim();
+                    UserData.enCodeStation = new String(Base64.encodeBase64(station_et.getText().toString().trim().getBytes()));//加密工站编号
+
+                    //获取本地保存的文件数据 并保存到全局变量
+                    String fileUrls =  util.getFilUrls();
+                    List<FilesEntity> entitys = JSON.parseArray(fileUrls, FilesEntity.class);
+                    UserData.filesEntities = entitys;
+
                     //判断网络状态
                     if(util.isNetWorkConnect()){//网络已连接
                         //开启一个线程去登录
@@ -77,20 +88,6 @@ public class LoginActivity extends AppCompatActivity {
                         loginThread.execute(ip,port,station);
                         loading_dialog = CustomProgress.show(LoginActivity.this,"登录中...",false,null);
                     }else{//没有网络
-                        //获取本地保存的数据 并保存到全局变量
-                        String fileUrls =  util.getFilUrls();
-                        if(fileUrls.equals("")){
-                            Toast.makeText(getBaseContext(),"没有缓存的文件，请先连接到网络登录！",Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        List<FilesEntity> entitys = JSON.parseArray(fileUrls, FilesEntity.class);
-                        UserData.filesEntities = entitys;
-
-                        //保存到全局变量asdfasd
-                        UserData.ip = ip;
-                        UserData.port = Integer.parseInt(port);
-                        UserData.station = station;
-                        UserData.enCodeStation = new String(Base64.encodeBase64(station.getBytes()));//加密工站编号
 
                         //跳转到界面 在MainActivity开启后台更新文件服务
                         Intent intent = new Intent(LoginActivity.this,MainActivity.class);
@@ -160,14 +157,8 @@ public class LoginActivity extends AppCompatActivity {
             Log.i(TAG,loginResult);
             String[] results = loginResult.split(" ");
             if(results.length>=5){
-                if(results[1].equals("0200")){//登录成功  保存数据
+                if(results[0].equals("LOGINRESULT") && results[1].equals("0200")){//登录成功  保存数据
                     util.saveLoginData(ip_et.getText().toString().trim(),port_et.getText().toString(),station_et.getText().toString().trim());
-
-                    //保存到全局变量
-                    UserData.ip = ip_et.getText().toString().trim();
-                    UserData.port = Integer.parseInt(port_et.getText().toString());
-                    UserData.station = station_et.getText().toString().trim();
-                    UserData.enCodeStation = new String(Base64.encodeBase64(station_et.getText().toString().trim().getBytes()));//加密工站编号
 
                     //跳转到界面 在MainActivity开启后台更新文件服务
                     Intent intent = new Intent(LoginActivity.this,MainActivity.class);

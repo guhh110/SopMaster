@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(final int position) {
+                Log.i(TAG,position+"-----onpageselect");
                 if(UserData.filesEntities!=null && position<UserData.filesEntities.size()){//以防下标越界 空指针
                     //更新页码指示器
                     pageNumber_tv.setText(position+1+"/"+UserData.filesEntities.size());
@@ -158,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
         if(pages.size()>1){
             pageNumber_tv.setText("1/"+pages.size());
             banner.setCanLoop(true);
@@ -170,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         }
         banner.setScrollDuration(500);
         startBannerPlay();
+        banner.getOnPageChangeListener().onPageSelected(0);//触发onPageSelected
 
         prev_ib.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -414,8 +417,8 @@ public class MainActivity extends AppCompatActivity {
         videoPlayer.onComplete(new Runnable() {
             @Override
             public void run() {//播放完成，下一首
-                if(UserData.filesEntities.size() == 1){//如果只有一个文件
-                    String video_url = getVideoUrl(UserData.filesEntities.get(0).getWocUrl());
+                if(UserData.filesEntities.size() == 1 || util.getPageChangeDelay()<=0){//如果只有一个文件 或者 不轮换 就重复播放当前视频
+                    String video_url = getVideoUrl(UserData.filesEntities.get(banner.getCurrentItem()).getWocUrl());
                     //申请权限
                     MainActivityPermissionsDispatcher.startVideoPlayWithCheck(MainActivity.this,video_url);
 //                    startVideoPlay(video_url);//开始播放视频
@@ -648,11 +651,15 @@ public class MainActivity extends AppCompatActivity {
                 stopVideoPlay();
                 showBannerHideVideoView();
                 updatePages();//更新viewpager
+                Toast.makeText(getBaseContext(),"发现新的作业，正在更新...",Toast.LENGTH_SHORT).show();
+
             }else if(action.equals(UserData.CONNECT_SERVER_SUCCESS_ACTION)){//后台service连接服务器成功
                 Toast.makeText(getBaseContext(),"连接服务器成功",Toast.LENGTH_SHORT).show();
 
             }else if(action.equals(UserData.PAGE_CHANGE_DELAY_CHANGED)){//更改轮换时间
-                startBannerPlay();//重新设置轮换时间
+                if(!videoPlayer.isPlaying()){//如果当前不是视频播放就立即更换轮换时间  如果当前正在播放视频那么在播放视频完成之后就会更新轮换时间
+                    startBannerPlay();//重新设置轮换时间
+                }
             }
         }
     }

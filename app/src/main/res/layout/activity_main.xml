@@ -119,6 +119,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp" />
         <ImageButton
+            android:visibility="gone"
             android:id="@+id/pause_ib"
             android:padding="3dp"
             android:background="@color/fbutton_color_wet_asphalt"

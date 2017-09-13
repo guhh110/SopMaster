@@ -985,8 +985,9 @@ public class GiraffePlayer {
     }
 
     public void stop(){
+        videoView.releaseWithoutStop();
         videoView.stopPlayback();
-//        videoView.release(false);
+        videoView.release(true);
     }
 
     /**
