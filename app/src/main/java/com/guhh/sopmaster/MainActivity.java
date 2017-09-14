@@ -339,6 +339,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         Log.i(TAG,"onConfigurationChanged");
+        if(banner!=null && videoPlayer!=null && !videoPlayer.isPlaying()){
+            startBannerPlay();//重置轮换冷却时间
+        }
         super.onConfigurationChanged(newConfig);
 
     }

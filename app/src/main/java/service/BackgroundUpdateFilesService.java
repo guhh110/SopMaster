@@ -106,8 +106,9 @@ public class BackgroundUpdateFilesService extends Service {
             InetSocketAddress socketAddress = new InetSocketAddress(UserData.ip,UserData.port);
             socket = new Socket();
             socket.connect(socketAddress,1000);//设置连接超时时间
-            socket.setSoTimeout(10000);//设置读取数据超时时间
-
+            socket.setSoTimeout(1000);//设置读取数据超时时间
+            is = socket.getInputStream();
+            printWriter = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
             //连接服务器成功
             Intent intent = new Intent(UserData.CONNECT_SERVER_SUCCESS_ACTION);
             sendBroadcast(intent);
@@ -128,10 +129,13 @@ public class BackgroundUpdateFilesService extends Service {
                     if(socket==null || socket.isClosed() || !socket.isConnected()){
                         connectSocket();
                     }
-                    if(is == null)
-                        is = socket.getInputStream();
-                    if(printWriter == null)
-                        printWriter = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+
+                    try{
+                        socket.sendUrgentData(0xFF);
+                    }catch(Exception ex){
+                        Log.i(TAG,ex.toString()+"reconnect");
+                        connectSocket();
+                    }
 
                     String cmd_getFile = DataProtocol.makeCmd(RequestCmd.Command.REQUESTWORK,UserData.enCodeStation);
                     String result_getFile =  util.sendCmdAndGetResult(is,printWriter,cmd_getFile);
