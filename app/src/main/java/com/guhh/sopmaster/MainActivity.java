@@ -474,6 +474,9 @@ public class MainActivity extends AppCompatActivity {
     void startVideoPlay(String url){
 //        Toast.makeText(getBaseContext(),url,Toast.LENGTH_SHORT).show();
         Log.i(TAG,url);
+        if(pause_ib!=null){
+            pause_ib.setImageResource(R.drawable.pause_selector);
+        }
         if(videoPlayer!=null){
             if(videoPlayer.isPlaying()){
                 videoPlayer.stop();
@@ -484,6 +487,9 @@ public class MainActivity extends AppCompatActivity {
 
     //停止播放视频
     private void stopVideoPlay(){
+        if(pause_ib!=null){
+            pause_ib.setImageResource(R.drawable.play_selector);
+        }
         if(videoPlayer!=null){
             videoPlayer.stop();
         }

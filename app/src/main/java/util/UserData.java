@@ -7,7 +7,7 @@ import java.util.List;
 import entity.FilesEntity;
 
 /**
- * Created by sunpn on 2017/9/5.
+ * Created by guhh on 2017/9/5.
  */
 
 public class UserData {
@@ -15,7 +15,10 @@ public class UserData {
     public static int port;
     public static String enCodeStation;//加密后的工站
     public static String station;
-    public static int getFilesDelay = 3000;//获取文件的间隔时间  单位毫秒
+    public static final int getFilesDelay = 6000;//获取文件的间隔时间  单位毫秒
+    public static final int socketConnectTime = 1000;//socket连接超时  单位毫秒
+    public static final int socketSoTime = 5000;//socket获取数据超时  单位毫秒
+
     public static List<FilesEntity> filesEntities = new ArrayList<>();
     public static final String NEW_FILE_ACTION = "com.guhh.sopMaster";
     public static final String CONNECT_SERVER_SUCCESS_ACTION = "com.guhh.sopMaster.CSSA";

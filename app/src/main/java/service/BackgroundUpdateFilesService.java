@@ -8,8 +8,12 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.guhh.sopmaster.LoginActivity;
+import com.guhh.sopmaster.MainActivity;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,17 +109,45 @@ public class BackgroundUpdateFilesService extends Service {
             Log.i(TAG,"连接socket");
             InetSocketAddress socketAddress = new InetSocketAddress(UserData.ip,UserData.port);
             socket = new Socket();
-            socket.connect(socketAddress,1000);//设置连接超时时间
-            socket.setSoTimeout(1000);//设置读取数据超时时间
+            socket.connect(socketAddress,UserData.socketConnectTime);//设置连接超时时间
+            socket.setSoTimeout(UserData.socketSoTime);//设置读取数据超时时间
             is = socket.getInputStream();
             printWriter = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-            //连接服务器成功
-            Intent intent = new Intent(UserData.CONNECT_SERVER_SUCCESS_ACTION);
-            sendBroadcast(intent);
+            boolean loginResult = login();//重新登录
+            if(loginResult){
+                //连接服务器成功
+                Intent intent = new Intent(UserData.CONNECT_SERVER_SUCCESS_ACTION);
+                sendBroadcast(intent);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             Log.i(TAG,"连接socket失败"+e.toString());
         }
+    }
+
+    //重连之后需要重新登录
+    private boolean login() throws IOException {
+        String login_cmd = DataProtocol.makeCmd(RequestCmd.Command.LOGIN,UserData.enCodeStation);//拼装登录命令
+        String result_login = util.sendCmdAndGetResult(is,printWriter,login_cmd);
+        String[] results = result_login.split(" ");
+        if(results.length>=5){
+            if(results[0].equals("LOGINRESULT") && results[1].equals("0200")){//登录成功  保存数据
+                return true;
+            }else{//登录失败  并提示原因
+                try {
+                    String msg = new String(Base64.decodeBase64(results[2].getBytes()));
+                    JSONObject root = new JSONObject(msg);
+                    String reason = root.getString("msg");
+                    Log.e(TAG,reason);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e(TAG,"解析json数据错误");
+                }
+                return false;
+            }
+        }
+        return false;
     }
 
     private class GetFilesUrlRunnable implements Runnable{
@@ -130,18 +162,17 @@ public class BackgroundUpdateFilesService extends Service {
                         connectSocket();
                     }
 
-                    try{
-                        socket.sendUrgentData(0xFF);
-                    }catch(Exception ex){
-                        Log.i(TAG,ex.toString()+"reconnect");
-                        connectSocket();
-                    }
-
                     String cmd_getFile = DataProtocol.makeCmd(RequestCmd.Command.REQUESTWORK,UserData.enCodeStation);
                     String result_getFile =  util.sendCmdAndGetResult(is,printWriter,cmd_getFile);
+                    if(result_getFile == null || result_getFile.equals("")){//socket已断开  重新连接
+                        closeSocket();//先关闭之前socket
+                        connectSocket();//重新连接socket 并 进行登录
+                        return;
+                    }
                     String[] result_getFile_arr = result_getFile.split(" ");
                     if(result_getFile_arr.length==5){//确定分割后的长度
-                        if(result_getFile_arr[1].equals("0200")){//获取文件成功
+                        String status_code = result_getFile_arr[1];
+                        if(status_code.equals("0200")){//获取文件成功
                             String fileUrls = new String(Base64.decodeBase64(result_getFile_arr[2].getBytes()));
                             try {
                                 List<FilesEntity> entitys = JSON.parseArray(fileUrls, FilesEntity.class);
@@ -159,6 +190,9 @@ public class BackgroundUpdateFilesService extends Service {
                                 e.printStackTrace();
                                 Log.i(TAG,e+"--");
                             }
+                        }else if(status_code.equals("0701")){//因为重连之后有重新登录的操作 一般不会执行这一块
+                            login();//重新登录
+                            Log.e(TAG,"获取文件失败，未登录");
                         }
                     }
                     Log.i(TAG,result_getFile+"-");

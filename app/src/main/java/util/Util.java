@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by sunpn on 2017/8/31.
+ * Created by guhh on 2017/8/31.
  */
 
 public class Util {
@@ -113,8 +113,8 @@ public class Util {
     public String sendCmdAndGetResult(String ip, int port, String cmd) throws IOException {
         Socket socket = new Socket();
         SocketAddress socketAddress = new InetSocketAddress(ip, port);
-        socket.connect(socketAddress,1000);
-        socket.setSoTimeout(10000);
+        socket.connect(socketAddress,UserData.socketConnectTime);
+        socket.setSoTimeout(UserData.socketSoTime);
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
         InputStream is = socket.getInputStream();
         pw.print(cmd);
