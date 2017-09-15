@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PersistableBundle;
@@ -37,6 +38,8 @@ import com.danikula.videocache.HttpProxyCacheServer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.net.ssl.ManagerFactoryParameters;
 
@@ -58,6 +61,7 @@ import dialog.SettingDialog;
 
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {
+    private long offlineTime = 0;//记录离线时间
     private int videoPlayerSeekPosition = 0;
 
     private Util util;
@@ -102,6 +106,10 @@ public class MainActivity extends AppCompatActivity {
 
     //
     private SettingDialog settingDialog;
+
+    //检查离线时间超时timer
+    private Timer checkOfflineTimeoutTimer;
+    private TimerTask checkOfflineTimeoutTimeTask;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -259,18 +267,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        hideBottomUIMenu();//全屏
+
         //开启后台更新文件服务
-        Intent intent = new Intent(MainActivity.this, BackgroundUpdateFilesService.class);
-        startService(intent);
+        if(util.isNetWorkConnect()){
+            Intent intent = new Intent(MainActivity.this, BackgroundUpdateFilesService.class);
+            startService(intent);
+        }
 
         //注册广播
         if(myBroadCastReceiver == null){
             myBroadCastReceiver = new MyBroadCastReceiver();
         }
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(UserData.NEW_FILE_ACTION);
-        intentFilter.addAction(UserData.CONNECT_SERVER_SUCCESS_ACTION);
-        intentFilter.addAction(UserData.PAGE_CHANGE_DELAY_CHANGED);
+        intentFilter.addAction(UserData.NEW_FILE_ACTION);//更新文件action
+        intentFilter.addAction(UserData.CONNECT_SERVER_SUCCESS_ACTION);//连接服务器超过action
+        intentFilter.addAction(UserData.PAGE_CHANGE_DELAY_CHANGED);//轮换时间改变action
+        intentFilter.addAction(UserData.GET_FILES_702);//获取文件返回702action
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);//网络状态改变action
+        intentFilter.addAction(UserData.OFFLINE_TIME_OUT);
         registerReceiver(myBroadCastReceiver,intentFilter);
 
         //恢复视频播放
@@ -637,7 +652,7 @@ public class MainActivity extends AppCompatActivity {
         pause_ib = (ImageButton) findViewById(R.id.pause_ib);
     }
 
-    //接收BackgroundUpdateFilesService发过来的更新文件的广播
+    //广播接受者
     class MyBroadCastReceiver extends BroadcastReceiver{
 
         @Override
@@ -658,8 +673,74 @@ public class MainActivity extends AppCompatActivity {
                 if(!videoPlayer.isPlaying()){//如果当前不是视频播放就立即更换轮换时间  如果当前正在播放视频那么在播放视频完成之后就会更新轮换时间
                     startBannerPlay();//重新设置轮换时间
                 }
+
+            }else if(action.equals(UserData.GET_FILES_702)){//获取文件返回702 表示该站点 在其他地方登录 本程序将退出到登录界面
+                Toast.makeText(getBaseContext(),"该站点在其他地方登录,本程序将退出到登录界面!",Toast.LENGTH_SHORT).show();
+                Intent intent2LoginActivity = new Intent(MainActivity.this,LoginActivity.class);
+                intent2LoginActivity.putExtra("needAutoLogin",false);//带个数据过去告诉LoginActivity不用自动登录
+                startActivity(intent2LoginActivity);
+                MainActivity.this.finish();
+
+            }else if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){//网络状态改变
+
+                if(util.isNetWorkConnect()){//如果是网络已连接 开启后台更新服务
+                    offlineTime = 0;//重置离线时间
+                    stopCheckOfflineTimeout();//取消检测离线时间是否超过
+                    Intent intentOfStarService = new Intent(MainActivity.this, BackgroundUpdateFilesService.class);
+                    startService(intentOfStarService);
+                    Toast.makeText(getBaseContext(),"网络已连接，开启后台更新服务！",Toast.LENGTH_SHORT).show();
+
+                }else{//如果是网络没有连接 关闭后台更新服务  记录离线时间 开启检测离线超时timer
+                    if(offlineTime == 0){//等于0才更新离线时间 记录最早的离线时间
+                        offlineTime = System.currentTimeMillis();//记录离线时间
+                        //开启timer检测离线时间是否超过
+                        startCheckOfflineTimeout();
+                    }
+                    Intent intentOfStopService = new Intent(MainActivity.this, BackgroundUpdateFilesService.class);
+                    stopService(intentOfStopService);
+                }
+
+            }else if(action.equals(UserData.OFFLINE_TIME_OUT)){//离线超时 退出到登录界面
+                Intent intent2LoginActivity = new Intent(MainActivity.this,LoginActivity.class);
+                intent2LoginActivity.putExtra("needAutoLogin",false);//带个数据过去告诉LoginActivity不用自动登录
+                startActivity(intent2LoginActivity);
+                MainActivity.this.finish();
+                Toast.makeText(getBaseContext(),"离线时间已经用完，请重新登录！",Toast.LENGTH_SHORT).show();
+
             }
         }
+    }
+
+    private void startCheckOfflineTimeout(){
+        if(checkOfflineTimeoutTimer == null){
+            checkOfflineTimeoutTimer = new Timer();
+        }
+        if(checkOfflineTimeoutTimeTask == null){
+            checkOfflineTimeoutTimeTask = new TimerTask() {
+                @Override
+                public void run() {
+                    if(offlineTime == 0){//如果等于0 就说明没有离线
+                        this.cancel();
+                        return;
+                    }
+                    final long currentTime = System.currentTimeMillis();
+                    Log.i(TAG+"---",currentTime - offlineTime+"=====");
+                    if(currentTime - offlineTime>=UserData.offlineTimeout){
+                        Intent intent = new Intent(UserData.OFFLINE_TIME_OUT);
+                        sendBroadcast(intent);
+                        stopCheckOfflineTimeout();//停止检测离线超时
+                    }
+                }
+            };
+        }
+        checkOfflineTimeoutTimer.schedule(checkOfflineTimeoutTimeTask,0,UserData.checkOfflineTimeoutTime);
+    }
+
+    private void stopCheckOfflineTimeout(){
+        if(checkOfflineTimeoutTimer!=null)
+            checkOfflineTimeoutTimer.cancel();
+        if(checkOfflineTimeoutTimeTask!=null)
+            checkOfflineTimeoutTimeTask.cancel();
     }
 
     private void updatePages() {

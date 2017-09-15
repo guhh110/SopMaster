@@ -37,7 +37,7 @@ import util.Util;
 public class BackgroundUpdateFilesService extends Service {
     private String TAG = "BUFS";
 
-    private boolean isRunning = false;
+    private boolean isRunning = false;//service是否在运行的标识
     private Socket socket;
     private InputStream is;
     private PrintWriter printWriter;
@@ -78,13 +78,13 @@ public class BackgroundUpdateFilesService extends Service {
     @Override
     public void onDestroy() {
         isRunning = false;
-        Log.i(TAG,"onDestroy");
         if(singleThreadPool!=null){
             List<Runnable> noCompleteRunnable = singleThreadPool.shutdownNow();
-            for (Runnable runnable :noCompleteRunnable) {
-                ((TimerTask)runnable).cancel();
-            }
-            Log.i(TAG, noCompleteRunnable.size()+"-");
+            Log.i(TAG,"onDestroy"+noCompleteRunnable.size());
+//            for (Runnable runnable :noCompleteRunnable) {
+//                ((ScheduledFutureTask)runnable).cancel();
+//            }
+//            Log.i(TAG, noCompleteRunnable.size()+"-");
             singleThreadPool = null;
         }
         closeSocket();
@@ -136,8 +136,21 @@ public class BackgroundUpdateFilesService extends Service {
         String result_login = util.sendCmdAndGetResult(is,printWriter,login_cmd);
         String[] results = result_login.split(" ");
         if(results.length>=5){
-            if(results[0].equals("LOGINRESULT") && results[1].equals("0200")){//登录成功  保存数据
+            String result_code = results[1];
+            String result_head = results[0];
+            if(result_head.equals("LOGINRESULT") && result_code.equals("0200")){//登录成功  保存数据
                 return true;
+
+            }else if(result_code.equals("0702")){//登录返回702 表示该站点 在其他地方登录 本程序将退出到登录界面
+                closeSocket();//关闭socket
+                Intent intent = new Intent(UserData.GET_FILES_702);
+                sendBroadcast(intent);
+
+            }else if(result_code.equals("0801")){//登录返回801 表示已经超过点数 退出到登录界面
+                closeSocket();
+                Intent intent = new Intent(UserData.GET_FILES_702);
+                sendBroadcast(intent);
+
             }else{//登录失败  并提示原因
                 try {
                     String msg = new String(Base64.decodeBase64(results[2].getBytes()));
@@ -169,8 +182,10 @@ public class BackgroundUpdateFilesService extends Service {
                     String cmd_getFile = DataProtocol.makeCmd(RequestCmd.Command.REQUESTWORK,UserData.enCodeStation);
                     String result_getFile =  util.sendCmdAndGetResult(is,printWriter,cmd_getFile);
                     if(result_getFile == null || result_getFile.equals("")){//socket已断开  重新连接
-                        closeSocket();//先关闭之前socket
-                        connectSocket();//重新连接socket 并 进行登录
+                        if(isRunning){//运行到这里先检查service是否还在运行
+                            closeSocket();//先关闭之前socket
+                            connectSocket();//重新连接socket 并 进行登录
+                        }
                         return;
                     }
                     String[] result_getFile_arr = result_getFile.split(" ");
@@ -197,6 +212,13 @@ public class BackgroundUpdateFilesService extends Service {
                         }else if(status_code.equals("0701")){//因为重连之后有重新登录的操作 一般不会执行这一块
                             login();//重新登录
                             Log.e(TAG,"获取文件失败，未登录");
+
+                        }else if(status_code.equals("0702")){//获取文件返回702 表示该站点 在其他地方登录 本程序将退出到登录界面
+                            closeSocket();//关闭socket
+                            Intent intent = new Intent(UserData.GET_FILES_702);
+                            sendBroadcast(intent);
+                            stopSelf();//停止后台更新
+                            this.cancel();//取消当前timerTask
                         }
                     }
                     Log.i(TAG,result_getFile+"-");
