@@ -16,8 +16,8 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:name=".App"
         >
+        <!--android:configChanges="screenSize|keyboardHidden|keyboard|orientation|screenLayout"-->
         <activity android:name=".MainActivity"
-            android:configChanges="screenSize|keyboardHidden|keyboard|orientation|screenLayout"
             android:screenOrientation="landscape"
             >
 

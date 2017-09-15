@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.view.ViewPager;
@@ -57,6 +58,8 @@ import dialog.SettingDialog;
 
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {
+    private int videoPlayerSeekPosition = 0;
+
     private Util util;
 
     private static String TAG = "MainActivity";
@@ -75,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView noPage_tv;
 
     //控制面板
-//    private boolean isOnConfigurationChanged = false;//记录是不是旋转屏幕
     private boolean isControlShowing = false;//记录控制栏的状态
     private LinearLayout ctrl_ll;
     private ImageButton prev_ib;
@@ -148,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
                         pause_ib.setVisibility(View.GONE);//隐藏暂停按钮
                         stopVideoPlay();//停止播放视频
                         showBannerHideVideoView();//显示banner
+                        startBannerPlay();//开始轮播
                     }
 //                    updatePauseButtonStatus();//更新暂停按钮状态
                     Log.i("sssddd-pos",position+"-"+UserData.filesEntities.get(position).getWocUrl());
@@ -198,24 +201,6 @@ public class MainActivity extends AppCompatActivity {
                 if(UserData.filesEntities ==null || UserData.filesEntities.size()-1<banner.getCurrentItem()){//防止下标越界
                     return;
                 }
-//
-//                if(UserData.filesEntities.get(banner.getCurrentItem()).isMp4()) {//当前轮播item为视频
-//                    Log.i(TAG,videoPlayer.isPlaying()+"--sss");
-//                    if(videoPlayer.isPlaying()){
-//                        pauseVideoPlay();
-//                    }else{
-//                        resumeVideoPlay();
-//                    }
-//                }else {//当前轮播item为图片
-//                   if(isBannerPlay){
-//                       isBannerPlay = false;
-//                       stopBannerPlay();
-//                   }else{
-//                       isBannerPlay = true;
-//                       startBannerPlay();
-//                   }
-//                }
-//                updatePauseButtonStatus(false);//更新暂停按钮状态
                 if(UserData.filesEntities.get(banner.getCurrentItem()).isMp4()) {//当前轮播item为视频
                     videoPlayer.show(5000);//显示控制栏
                     Log.i(TAG,videoPlayer.isPlaying()+"--sss");
@@ -290,14 +275,7 @@ public class MainActivity extends AppCompatActivity {
 
         //恢复视频播放
         resumeVideoPlay();
-
         Log.i(TAG,"onResume");
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        recreate();
     }
 
     @Override
@@ -311,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
         //反注册广播
         unregisterReceiver(myBroadCastReceiver);
 
-        //暂停视频
+        //停止视频
         pauseVideoPlay();
 
         Log.i(TAG,"onPause");
@@ -328,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
         stopVideoPlay();
 
         //清除数据
-        UserData.clear();
+//        UserData.clear();
 
         //停止轮播
         banner.stopTurning();
@@ -337,13 +315,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        Log.i(TAG,"onConfigurationChanged");
-        if(banner!=null && videoPlayer!=null && !videoPlayer.isPlaying()){
-            startBannerPlay();//重置轮换冷却时间
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.i(TAG,"onSaveInstanceState");
+        if(videoPlayer !=null){
+            outState.putInt("videoPlayerSeekPosition",videoPlayer.getCurrentPosition());
+            videoPlayerSeekPosition = videoPlayer.getCurrentPosition();
+            Log.i(TAG,"onSaveInstanceState"+videoPlayer.getCurrentPosition());
         }
-        super.onConfigurationChanged(newConfig);
+        super.onSaveInstanceState(outState);
+    }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.i(TAG,"onRestoreInstanceState");
+        videoPlayerSeekPosition =  savedInstanceState.getInt("videoPlayerSeekPosition",0);
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
@@ -504,12 +490,15 @@ public class MainActivity extends AppCompatActivity {
 
     //恢复播放视频
     private void resumeVideoPlay(){
+        Log.i(TAG,"resumeVideoPlay"+videoPlayerSeekPosition);
         if(videoPlayer!=null){
             videoPlayer.start();
+            if(videoPlayerSeekPosition>0){
+                videoPlayer.seekTo(videoPlayerSeekPosition-5*1000,true);
+                videoPlayerSeekPosition = 0;
+            }
         }
     }
-
-
 
     //下一个
     private void bannerToNext(){

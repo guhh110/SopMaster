@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -79,8 +80,11 @@ public class BackgroundUpdateFilesService extends Service {
         isRunning = false;
         Log.i(TAG,"onDestroy");
         if(singleThreadPool!=null){
-            List<Runnable> a = singleThreadPool.shutdownNow();
-            Log.i(TAG, a.size()+"-");
+            List<Runnable> noCompleteRunnable = singleThreadPool.shutdownNow();
+            for (Runnable runnable :noCompleteRunnable) {
+                ((TimerTask)runnable).cancel();
+            }
+            Log.i(TAG, noCompleteRunnable.size()+"-");
             singleThreadPool = null;
         }
         closeSocket();
@@ -150,7 +154,7 @@ public class BackgroundUpdateFilesService extends Service {
         return false;
     }
 
-    private class GetFilesUrlRunnable implements Runnable{
+    private class GetFilesUrlRunnable extends TimerTask {
 
         @Override
         public void run() {
