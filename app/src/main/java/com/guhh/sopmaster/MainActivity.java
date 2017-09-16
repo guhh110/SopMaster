@@ -460,10 +460,10 @@ public class MainActivity extends AppCompatActivity {
     //开始轮播
     private void startBannerPlay(){
         if(banner!=null){
-            int delay = util.getPageChangeDelay();
+            long delay = util.getPageChangeDelay();
             Log.i(TAG,delay+"+delay");
             if(delay>0){
-                banner.startTurning(delay*1000);
+                banner.startTurning(delay);
             }else{
                 stopBannerPlay();
             }

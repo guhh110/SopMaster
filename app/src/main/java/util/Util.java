@@ -97,17 +97,39 @@ public class Util {
     }
 
     //保存图片轮换时间
-    public void savePageChangeDelay(int delay){
+    public void savePageChangeDelay(long delay){
         //保存到本地
         SharedPreferences.Editor editor = context.getSharedPreferences("pageChangeDelay",Context.MODE_PRIVATE).edit();
-        editor.putInt("delay",delay);
+        editor.putLong("delay",delay);
         editor.apply();
     }
 
     //获取图片轮换时间
-    public int getPageChangeDelay(){
+    public long getPageChangeDelay(){
         SharedPreferences sp = context.getSharedPreferences("pageChangeDelay",Context.MODE_PRIVATE);
-        return  sp.getInt("delay",5);
+        return  sp.getLong("delay",5000);
+    }
+
+    //获取图片轮换时间
+    public HashMap<String,Integer> getPageChangeDelayFormat(){
+        SharedPreferences sp = context.getSharedPreferences("pageChangeDelay",Context.MODE_PRIVATE);
+        long changeDelay = sp.getLong("delay",5000);
+        int ss = 1000;
+        int mi = ss * 60;
+        int hh = mi * 60;
+        int dd = hh * 24;
+
+        int day = (int) (changeDelay / dd);
+        int hour = (int) ((changeDelay - day * dd) / hh);
+        int minute = (int) ((changeDelay - day * dd - hour * hh) / mi);
+        int second = (int) ((changeDelay - day * dd - hour * hh - minute * mi) / ss);
+
+
+        HashMap<String,Integer> date = new HashMap<>();
+        date.put("hour",hour);
+        date.put("minute",minute);
+        date.put("second",second);
+        return date;
     }
 
     public String sendCmdAndGetResult(String ip, int port, String cmd) throws IOException {

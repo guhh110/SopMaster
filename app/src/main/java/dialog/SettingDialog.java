@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,17 +19,22 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.guhh.sopmaster.R;
 import com.xw.repo.BubbleSeekBar;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import cn.carbswang.android.numberpickerview.library.NumberPickerView;
 import util.UserData;
 import util.Util;
 
@@ -38,13 +46,20 @@ public class SettingDialog extends Dialog {
     private Util util;
 
     private static String TAG = "SettingDialog";
-    private TextView sysSet_tv;
+    private TextView timeSet_tv;
     private TextView wifiSet_tv;
     private TextView netSet_tv;
     private TextView update_tv;
+    private TextView languageSet_tv;
+
+    private NumberPickerView hour_npv;
+    private NumberPickerView minute_npv;
+    private NumberPickerView second_npv;
+
+
     private static Context context;
 
-    private BubbleSeekBar bubbleSeekBar;
+//    private BubbleSeekBar bubbleSeekBar;
 
     //更新软件相关
     private SearchFileDialog searchFileDialog;
@@ -74,42 +89,67 @@ public class SettingDialog extends Dialog {
      *
      */
     public void intView() {
-        int delay = util.getPageChangeDelay();
-        bubbleSeekBar = (BubbleSeekBar) findViewById(R.id.my_seekbar);
-        bubbleSeekBar.setProgress(delay);
+        HashMap<String, Integer> delay = util.getPageChangeDelayFormat();
+//        bubbleSeekBar = (BubbleSeekBar) findViewById(R.id.my_seekbar);
+//        bubbleSeekBar.setProgress(delay);
 
-        sysSet_tv = (TextView) findViewById(R.id.sysSet_tv);
+        timeSet_tv = (TextView) findViewById(R.id.timeSet_tv);
         wifiSet_tv = (TextView) findViewById(R.id.wifiSet_tv);
         netSet_tv = (TextView) findViewById(R.id.netSet_tv);
         update_tv = (TextView) findViewById(R.id.updateSet_tv);
+        languageSet_tv = (TextView) findViewById(R.id.languageSet_tv);
+        hour_npv = (NumberPickerView) findViewById(R.id.hour_npv);
+        minute_npv = (NumberPickerView) findViewById(R.id.minute_npv);
+        second_npv = (NumberPickerView) findViewById(R.id.second_npv);
 
-        bubbleSeekBar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener() {
-            @Override
-            public void onProgressChanged(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+        setData(hour_npv,0,23,delay.get("hour"));
+        setData(minute_npv,0,59,delay.get("minute"));
+        setData(second_npv,0,23,delay.get("second"));
 
-            }
+        MyNumberPickerValueChangeListener myNumberPickerValueChangeListener = new MyNumberPickerValueChangeListener();
+        hour_npv.setOnValueChangedListener(myNumberPickerValueChangeListener);
+        minute_npv.setOnValueChangedListener(myNumberPickerValueChangeListener);
+        second_npv.setOnValueChangedListener(myNumberPickerValueChangeListener);
 
-            @Override
-            public void getProgressOnActionUp(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
 
-            }
 
-            @Override
-            public void getProgressOnFinally(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
-                util.savePageChangeDelay(progress);//保存到本地
-                Intent intent = new Intent(UserData.PAGE_CHANGE_DELAY_CHANGED);
-                context.sendBroadcast(intent);//通知MainActivity 切换时间改变了
-            }
-        });
+//        bubbleSeekBar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener() {
+//            @Override
+//            public void onProgressChanged(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+//
+//            }
+//
+//            @Override
+//            public void getProgressOnActionUp(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+//
+//            }
+//
+//            @Override
+//            public void getProgressOnFinally(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+//                util.savePageChangeDelay(progress);//保存到本地
+//                Intent intent = new Intent(UserData.PAGE_CHANGE_DELAY_CHANGED);
+//                context.sendBroadcast(intent);//通知MainActivity 切换时间改变了
+//            }
+//        });
 
-        sysSet_tv.setOnClickListener(new View.OnClickListener() {
+        timeSet_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Settings.ACTION_SETTINGS);
+                Intent intent = new Intent(Settings. ACTION_DATE_SETTINGS);
                 context.startActivity(intent);
                 dismiss();
             }
         });
+
+        languageSet_tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Settings. ACTION_INPUT_METHOD_SETTINGS);
+                context.startActivity(intent);
+                dismiss();
+            }
+        });
+
         wifiSet_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,6 +195,12 @@ public class SettingDialog extends Dialog {
                 context.registerReceiver(udabcr, intentFilter);
             }
         });
+    }
+
+    private void setData(NumberPickerView picker, int minValue, int maxValue, int value){
+        picker.setMinValue(minValue);
+        picker.setMaxValue(maxValue);
+        picker.setValue(value);
     }
 
 //    private File searchFiles() {
@@ -246,30 +292,81 @@ public class SettingDialog extends Dialog {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             Log.i(TAG,action);
-            if(intent.getAction().equals(Intent.ACTION_MEDIA_MOUNTED)){
+            if(action.equals(Intent.ACTION_MEDIA_MOUNTED)){
                 searchFileDialog.setMessage("已检测到U盘！");
                 String path = intent.getDataString();
                 Log.i(TAG,path+"--path");
                 String pathString = path.split("file://")[1] + "/";//U盘路径
-                Log.i(TAG,pathString+"--pathString");
-                File file = new File(pathString+"SopMaster.apk");
-                if(file.exists()){
-                    Intent intent_openApk = getApkFileIntent(file);
-                    context.startActivity(intent_openApk);
+                int currentVersionCode = getVersionCode();//获取当前版本号
+                File[] apkFiles = new File(pathString).listFiles(new ApkFileFilter());//获取根目录下的所有apk
+                Log.i(TAG,Arrays.toString(apkFiles));
+                HashMap<String,String> newVersionApkInfo = getNewVersionApk(apkFiles,currentVersionCode);//获取根目录下的最新的SOPMaster安装包
+
+                if(newVersionApkInfo != null){
+                    String newVersionSopPath = newVersionApkInfo.get("path");
+                    String newVersionCode = newVersionApkInfo.get("versionCode");
+                    Toast.makeText(getContext(),"已经找到新版本的SOP，版本号为"+newVersionCode,Toast.LENGTH_SHORT).show();
+                    File file = new File(newVersionSopPath);
+                    Intent installApkIntent = getApkFileIntent(file);
+                    context.startActivity(installApkIntent);
                     searchFileDialog.dismiss();
+
                 }else{
-                    searchFileDialog.setMessage("没有找到更新文件！");
+                    searchFileDialog.setMessage("没有找到新版本的SOPMaster！");
+
                 }
+
+            }else if(action.equals(Intent.ACTION_MEDIA_UNMOUNTED)){
+                searchFileDialog.setMessage("U盘已经移除！");
             }
         }
     }
 
-
-    public class ApkFileFilter implements FileFilter {
+    class MyNumberPickerValueChangeListener implements NumberPickerView.OnValueChangeListener {
 
         @Override
-        public boolean accept(File pathname) {
-            String filename = pathname.getName().toLowerCase();
+        public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
+            long changePageDelay = (hour_npv.getValue() * 60 * 60  + minute_npv.getValue() * 60 + second_npv.getValue()) * 1000;
+            Toast.makeText(getContext(),String.valueOf(changePageDelay),Toast.LENGTH_SHORT).show();
+            util.savePageChangeDelay(changePageDelay);
+            Intent intent = new Intent(UserData.PAGE_CHANGE_DELAY_CHANGED);
+            context.sendBroadcast(intent);//通知MainActivity 切换时间改变了
+//            int id = picker.getId();
+//            switch (id){
+//                case R.id.hour_npv:
+//
+//                    break;
+//                case R.id.minute_npv:
+//
+//                    break;
+//                case R.id.second_npv:
+//
+//                    break;
+//            }
+        }
+    }
+
+    /**
+     * 获取版本号
+     *
+     * @return 当前应用的版本号
+     */
+    private int getVersionCode() {
+        int vid = 0;
+        try {
+            PackageManager manager = context.getPackageManager();
+            PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
+            vid = info.versionCode;
+        } catch (Exception e) {
+            vid = -1;
+        }
+        return vid;
+    }
+
+    public class ApkFileFilter implements FilenameFilter {
+        @Override
+        public boolean accept(File dir, String name) {
+            String filename = name.toLowerCase();
             if(filename.endsWith(".apk")){
                 return true;
             }else{
@@ -279,7 +376,7 @@ public class SettingDialog extends Dialog {
     }
 
     //Android获取一个用于打开APK文件的intent
-    public static Intent getApkFileIntent( File file ) {
+    private Intent getApkFileIntent( File file ) {
 
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -287,5 +384,46 @@ public class SettingDialog extends Dialog {
         Uri uri = Uri.fromFile(file);
         intent.setDataAndType(uri,"application/vnd.android.package-archive");
         return intent;
+    }
+
+    private HashMap<String,String> getNewVersionApk(File[] apks,int currentVersion){
+        int newCode = 0; //找到的最新版本代码
+        String newPath = "";
+        for (File fs : apks) {
+            if(searchFileDialog!=null){
+                searchFileDialog.setMessage(fs.getAbsolutePath());
+            }
+
+            PackageManager pm = context.getPackageManager();
+            PackageInfo info = pm.getPackageArchiveInfo(fs.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+            if (info != null) {
+                ApplicationInfo appInfo = info.applicationInfo;
+                String appName = pm.getApplicationLabel(appInfo).toString();
+                String packageName = appInfo.packageName;  //得到安装包名称
+                //String version = info.versionName;       //得到版本信息
+                int versioncode = info.versionCode;
+                //String pkgInfoStr = String.format("PackageName:%s, Vesion: %s, AppName: %s ,VerCode: %s", packageName, version, appName, vercode);
+                //Toast.makeText(this, pkgInfoStr, Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "vercode:" + vercode + ",currCode:" + currCode + ",appName:" + appName + ",packageName:" + packageName, Toast.LENGTH_SHORT);
+                if (versioncode >= currentVersion && appName.equals("SOPMaster") && packageName.equals("com.guhh.sopmaster")) {
+                    if (versioncode > newCode) {
+                        Log.i(TAG,versioncode+"-"+appName+"-"+packageName+"-"+fs);
+                        newCode = versioncode;
+                        newPath = fs.getAbsolutePath();
+                    }
+                }
+            }else{
+                Log.i(TAG,fs+"-null");
+            }
+        }
+
+        if (newCode <= 0 || newCode < currentVersion){//没有找到新版本
+            return null;
+        }else {
+            HashMap<String,String> newVersionApkInfo = new HashMap<>();
+            newVersionApkInfo.put("path",newPath);
+            newVersionApkInfo.put("versionCode", String.valueOf(newCode));
+            return newVersionApkInfo;
+        }
     }
 }

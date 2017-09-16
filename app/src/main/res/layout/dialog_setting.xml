@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="250dp"
+    android:layout_width="300dp"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center"
@@ -13,19 +13,6 @@
     android:paddingBottom="3dp"
 
     >
-    <TextView
-        android:id="@+id/sysSet_tv"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:padding="10dp"
-        android:textColor="#fff"
-        android:text="系统设置"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:background="#fff"
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp" />
     <TextView
         android:id="@+id/wifiSet_tv"
         android:textSize="16sp"
@@ -66,27 +53,58 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp" />
     <TextView
-        android:layout_weight="1"
+        android:id="@+id/timeSet_tv"
         android:textSize="16sp"
         android:gravity="center"
         android:padding="10dp"
         android:textColor="#fff"
+        android:text="时间设置"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:background="#fff"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp" />
+    <TextView
+        android:id="@+id/languageSet_tv"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textColor="#fff"
+        android:text="语言设置"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:background="#fff"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp" />
+    <TextView
+        android:layout_weight="1"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:paddingTop="10dp"
+        android:textColor="#fff"
         android:text="自动轮换"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <com.xw.repo.BubbleSeekBar
-        android:layout_marginBottom="5dp"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        android:layout_weight="1"
         android:id="@+id/my_seekbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         app:bsb_bubble_color="@color/fbutton_color_belize_hole"
         app:bsb_bubble_text_color="#fff"
-        app:bsb_max="20"
+        app:bsb_max="30"
         app:bsb_min="0"
         app:bsb_progress="5"
         app:bsb_second_track_color="@color/fbutton_color_belize_hole"
-        app:bsb_section_count="4"
+        app:bsb_section_count="6"
         app:bsb_section_text_position="below_section_mark"
         app:bsb_touch_to_seek="true"
         app:bsb_show_progress_in_float="true"
@@ -95,4 +113,64 @@
         app:bsb_show_thumb_text="true"
         app:bsb_auto_adjust_section_mark="true"
         app:bsb_track_color="@color/fbutton_color_asbestos"/>
+    <cn.carbswang.android.numberpickerview.library.NumberPickerView
+        android:layout_marginRight="2dp"
+        android:layout_weight="1"
+        android:id="@+id/hour_npv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:npv_DividerColor="@color/fbutton_color_asbestos"
+        app:npv_TextColorNormal="@color/fbutton_color_asbestos"
+        app:npv_TextColorSelected="@color/fbutton_color_belize_hole"
+        app:npv_ItemPaddingHorizontal="5dp"
+        app:npv_ItemPaddingVertical="5dp"
+        app:npv_TextColorHint="#fff"
+        app:npv_HintText="时"
+        app:npv_ShowCount="3"
+        app:npv_TextArray="@array/hour"
+        app:npv_RespondChangeOnDetached="false"
+        app:npv_TextSizeNormal="16sp"
+        app:npv_TextSizeSelected="20sp"
+        app:npv_WrapSelectorWheel="true"/>
+    <cn.carbswang.android.numberpickerview.library.NumberPickerView
+        android:layout_marginRight="2dp"
+        android:layout_weight="1"
+        android:id="@+id/minute_npv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:npv_DividerColor="@color/fbutton_color_asbestos"
+        app:npv_TextColorNormal="@color/fbutton_color_asbestos"
+        app:npv_TextColorSelected="@color/fbutton_color_belize_hole"
+        app:npv_ItemPaddingHorizontal="5dp"
+        app:npv_ItemPaddingVertical="5dp"
+        app:npv_TextColorHint="#fff"
+        app:npv_HintText="分"
+        app:npv_ShowCount="3"
+        app:npv_TextArray="@array/minute_or_second_display"
+        app:npv_RespondChangeOnDetached="false"
+        app:npv_TextSizeNormal="16sp"
+        app:npv_TextSizeSelected="20sp"
+        app:npv_WrapSelectorWheel="true"/>
+    <cn.carbswang.android.numberpickerview.library.NumberPickerView
+        android:layout_weight="1"
+        android:id="@+id/second_npv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:npv_DividerColor="@color/fbutton_color_asbestos"
+        app:npv_TextColorNormal="@color/fbutton_color_asbestos"
+        app:npv_TextColorSelected="@color/fbutton_color_belize_hole"
+        app:npv_ItemPaddingHorizontal="5dp"
+        app:npv_ItemPaddingVertical="5dp"
+        app:npv_TextColorHint="#fff"
+        app:npv_HintText="秒"
+        app:npv_ShowCount="3"
+        app:npv_TextArray="@array/minute_or_second_display"
+        app:npv_RespondChangeOnDetached="false"
+        app:npv_TextSizeNormal="16sp"
+        app:npv_TextSizeSelected="20sp"
+        app:npv_WrapSelectorWheel="true"/>
+</LinearLayout>
 </LinearLayout>

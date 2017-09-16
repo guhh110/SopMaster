@@ -40,4 +40,5 @@ dependencies {
     compile 'com.xw.repo:bubbleseekbar:3.7'
     compile 'com.github.hotchemi:permissionsdispatcher:2.4.0'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
+    compile 'cn.carbswang.android:NumberPickerView:1.1.1'
 }
