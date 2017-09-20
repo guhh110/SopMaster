@@ -1,6 +1,8 @@
 package com.guhh.sopmaster;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -22,6 +25,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import dialog.SettingDialog;
 import entity.FilesEntity;
 import util.DataProtocol;
 import util.RequestCmd;
@@ -41,6 +45,12 @@ public class LoginActivity extends AppCompatActivity {
 
     //是否自动登录
     private boolean needAutoLogin = true;
+
+    private ImageButton changScreenOrientation_btn;
+    private ImageButton more_btn;
+
+    //
+    private SettingDialog settingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +113,30 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+
+        changScreenOrientation_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentOrientation = getResources().getConfiguration().orientation;
+                if(currentOrientation == Configuration.ORIENTATION_PORTRAIT){
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+                }else if(currentOrientation == Configuration.ORIENTATION_LANDSCAPE){
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+                }
+            }
+        });
+
+        more_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                settingDialog = SettingDialog.show(LoginActivity.this,true);
+            }
+        });
+
     }
 
     @Override
@@ -126,6 +160,9 @@ public class LoginActivity extends AppCompatActivity {
 
     //初始化控件
     private void iniView() {
+        more_btn = (ImageButton) findViewById(R.id.more_btn);
+        changScreenOrientation_btn = (ImageButton) findViewById(R.id.changScreenOrientation_btn);
+
         login_btn = (Button) findViewById(R.id.login_btn);
         station_et = (EditText) findViewById(R.id.station_et);
         ip_et = (EditText) findViewById(R.id.ip_et);

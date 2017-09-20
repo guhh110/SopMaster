@@ -7,78 +7,142 @@
     tools:context=".LoginActivity"
     android:orientation="vertical"
     >
-<LinearLayout
-    android:layout_gravity="center"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    tools:context=".LoginActivity"
-    android:orientation="vertical">
-    <ImageView
-        android:id="@+id/icon_iv"
-        android:layout_marginTop="10dp"
-        android:src="@mipmap/ic_launcher"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-         />
-    <RelativeLayout
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:layout_marginTop="20dp"
-            android:id="@+id/tv0"
-            android:text="工站编号："
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:inputType="text"
-            android:layout_toRightOf="@id/tv0"
-            android:layout_alignBaseline="@id/tv0"
-            android:id="@+id/station_et"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:id="@+id/tv1"
-            android:layout_below="@id/tv0"
-            android:layout_marginTop="25dp"
-            android:text="IP地址："
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:visibility="visible"
+            android:alpha="0.8"
+            android:background="@color/fbutton_color_wet_asphalt"
+            android:orientation="horizontal"
+            android:id="@+id/toolBar_ll"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+            <ImageView
+                android:scaleType="centerInside"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:src="@mipmap/ic_launcher"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+            <TextView
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:textColor="#fff"
+                android:text="@string/app_name"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <!--<ImageButton
+                android:visibility=""
+                android:id="@+id/exit_login_btn"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                android:src="@drawable/exit_login_selector"
+                android:padding="10dp"
+                android:background="@color/fbutton_color_wet_asphalt"
+                android:layout_width="50dp"
+                android:layout_height="50dp" />-->
+            <ImageButton
+                android:visibility="visible"
+                android:id="@+id/changScreenOrientation_btn"
+                android:layout_marginLeft="5dp"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                android:src="@drawable/change_selector"
+                android:padding="11dp"
+                android:background="@color/fbutton_color_wet_asphalt"
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+            <ImageButton
+                android:id="@+id/more_btn"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                android:src="@drawable/more_selector"
+                android:padding="10dp"
+                android:background="@color/fbutton_color_wet_asphalt"
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@id/tv0"
-            android:layout_alignRight="@id/tv0" />
-        <EditText
-            android:inputType="text"
-            android:id="@+id/ip_et"
-            android:layout_alignBaseline="@id/tv1"
-            android:layout_toRightOf="@+id/tv1"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:layout_alignRight="@id/tv1"
-            android:layout_alignEnd="@id/tv1"
-            android:id="@+id/tv2"
-            android:layout_marginTop="25dp"
-            android:layout_below="@id/tv1"
-            android:text="端口号："
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-             />
-        <EditText
-            android:inputType="number"
-            android:id="@+id/port_et"
-            android:layout_toRightOf="@id/tv2"
-            android:layout_alignBaseline="@id/tv2"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content" />
-        <Button
-            android:id="@+id/login_btn"
-            android:layout_alignEnd="@id/port_et"
-            android:layout_marginTop="20dp"
-            android:layout_below="@id/tv2"
-            android:text="登录"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignRight="@id/port_et" />
-    </RelativeLayout>
-</LinearLayout>
+            tools:context=".LoginActivity"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/icon_iv"
+                android:layout_marginTop="10dp"
+                android:src="@mipmap/ic_launcher"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                />
+            <RelativeLayout
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:id="@+id/tv0"
+                    android:text="工站编号："
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:inputType="text"
+                    android:layout_toRightOf="@id/tv0"
+                    android:layout_alignBaseline="@id/tv0"
+                    android:id="@+id/station_et"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/tv1"
+                    android:layout_below="@id/tv0"
+                    android:layout_marginTop="25dp"
+                    android:text="IP地址："
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@id/tv0"
+                    android:layout_alignRight="@id/tv0" />
+                <EditText
+                    android:inputType="text"
+                    android:id="@+id/ip_et"
+                    android:layout_alignBaseline="@id/tv1"
+                    android:layout_toRightOf="@+id/tv1"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_alignRight="@id/tv1"
+                    android:layout_alignEnd="@id/tv1"
+                    android:id="@+id/tv2"
+                    android:layout_marginTop="25dp"
+                    android:layout_below="@id/tv1"
+                    android:text="端口号："
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <EditText
+                    android:inputType="number"
+                    android:id="@+id/port_et"
+                    android:layout_toRightOf="@id/tv2"
+                    android:layout_alignBaseline="@id/tv2"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content" />
+                <Button
+                    android:id="@+id/login_btn"
+                    android:layout_alignEnd="@id/port_et"
+                    android:layout_marginTop="20dp"
+                    android:layout_below="@id/tv2"
+                    android:text="登录"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@id/port_et" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
 </ScrollView>

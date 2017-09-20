@@ -144,7 +144,7 @@ public class SettingDialog extends Dialog {
         languageSet_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Settings. ACTION_INPUT_METHOD_SETTINGS);
+                Intent intent = new Intent(Settings.ACTION_INPUT_METHOD_SUBTYPE_SETTINGS);
                 context.startActivity(intent);
                 dismiss();
             }

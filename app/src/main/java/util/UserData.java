@@ -21,7 +21,7 @@ public class UserData {
 //    public static final long offlineTimeout = 48 * 60 * 60 * 1000; //离线时间超时 单位毫秒
 //    public static final long checkOfflineTimeoutTime = 2 * 60 * 60 * 1000; //离线时间超时 单位毫秒
     public static final long offlineTimeout = 7 * 1000; //离线时间超时 单位毫秒
-    public static final long checkOfflineTimeoutTime = 1000; //离线时间超时 单位毫秒
+    public static final long checkOfflineTimeoutTime = 1000; //检查离线时间超时的时间 单位毫秒
 
 
     public static List<FilesEntity> filesEntities = new ArrayList<>();
