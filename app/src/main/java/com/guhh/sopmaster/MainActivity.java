@@ -362,44 +362,44 @@ public class MainActivity extends AppCompatActivity {
     @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
      void showRequestPermissionTip(final PermissionRequest request){
         new AlertDialog.Builder(this)
-                .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         request.proceed();
                     }
                 })
-                .setNegativeButton("不给", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         request.cancel();
                     }
                 })
                 .setCancelable(false)
-                .setMessage("视频和图片缓存需要写入权限")
+                .setMessage(R.string.needPremission)
                 .show();
     }
 
     @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
      void showPermissionDeniedTip(){
-        Toast.makeText(getBaseContext(),"拒绝写入权限视频和图片将无法缓存",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getBaseContext(), R.string.msg,Toast.LENGTH_SHORT).show();
     }
     @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
      void showPermissionNeverAsk(){
         new AlertDialog.Builder(this)
-                .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 })
                 .setCancelable(false)
-                .setMessage("您已经禁止了写入权限,是否现在去开启")
+                .setMessage(R.string.openPerssion)
                 .show();
     }
 
@@ -436,7 +436,7 @@ public class MainActivity extends AppCompatActivity {
         videoPlayer.onError(new GiraffePlayer.OnErrorListener() {
             @Override
             public void onError(int what, int extra) {
-                Toast.makeText(getBaseContext(), "不支持此类视频的播放，即将播放下一个。", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), R.string.playErr, Toast.LENGTH_LONG).show();
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -664,10 +664,10 @@ public class MainActivity extends AppCompatActivity {
                 stopVideoPlay();
                 showBannerHideVideoView();
                 updatePages();//更新viewpager
-                Toast.makeText(getBaseContext(),"发现新的作业，正在更新...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), R.string.newFiles,Toast.LENGTH_SHORT).show();
 
             }else if(action.equals(UserData.CONNECT_SERVER_SUCCESS_ACTION)){//后台service连接服务器成功
-                Toast.makeText(getBaseContext(),"连接服务器成功",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), R.string.connectServerSuc,Toast.LENGTH_SHORT).show();
 
             }else if(action.equals(UserData.PAGE_CHANGE_DELAY_CHANGED)){//更改轮换时间
                 if(!videoPlayer.isPlaying()){//如果当前不是视频播放就立即更换轮换时间  如果当前正在播放视频那么在播放视频完成之后就会更新轮换时间
@@ -675,7 +675,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }else if(action.equals(UserData.GET_FILES_702)){//获取文件返回702 表示该站点 在其他地方登录 本程序将退出到登录界面
-                Toast.makeText(getBaseContext(),"该站点在其他地方登录,本程序将退出到登录界面!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), R.string.otherPointerLogin_Exit,Toast.LENGTH_SHORT).show();
                 Intent intent2LoginActivity = new Intent(MainActivity.this,LoginActivity.class);
                 intent2LoginActivity.putExtra("needAutoLogin",false);//带个数据过去告诉LoginActivity不用自动登录
                 startActivity(intent2LoginActivity);
@@ -688,7 +688,7 @@ public class MainActivity extends AppCompatActivity {
                     stopCheckOfflineTimeout();//取消检测离线时间是否超过
                     Intent intentOfStarService = new Intent(MainActivity.this, BackgroundUpdateFilesService.class);
                     startService(intentOfStarService);
-                    Toast.makeText(getBaseContext(),"网络已连接，开启后台更新服务！",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), R.string.netWrokConnect_openService,Toast.LENGTH_SHORT).show();
 
                 }else{//如果是网络没有连接 关闭后台更新服务  记录离线时间 开启检测离线超时timer
                     if(offlineTime == 0){//等于0才更新离线时间 记录最早的离线时间
@@ -705,7 +705,7 @@ public class MainActivity extends AppCompatActivity {
                 intent2LoginActivity.putExtra("needAutoLogin",false);//带个数据过去告诉LoginActivity不用自动登录
                 startActivity(intent2LoginActivity);
                 MainActivity.this.finish();
-                Toast.makeText(getBaseContext(),"离线时间已经用完，请重新登录！",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), R.string.offlineTimeOut,Toast.LENGTH_SHORT).show();
 
             }
         }

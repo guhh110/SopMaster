@@ -19,7 +19,7 @@
         android:gravity="center"
         android:padding="10dp"
         android:textColor="#fff"
-        android:text="WIFI设置"
+        android:text="@string/wifi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
@@ -32,7 +32,7 @@
         android:gravity="center"
         android:padding="10dp"
         android:textColor="#fff"
-        android:text="网络设置"
+        android:text="@string/netWork"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
@@ -45,7 +45,7 @@
         android:gravity="center"
         android:padding="10dp"
         android:textColor="#fff"
-        android:text="更新软件"
+        android:text="@string/updateApp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
@@ -58,7 +58,7 @@
         android:gravity="center"
         android:padding="10dp"
         android:textColor="#fff"
-        android:text="时间设置"
+        android:text="@string/timeSet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
@@ -71,7 +71,7 @@
         android:gravity="center"
         android:padding="10dp"
         android:textColor="#fff"
-        android:text="语言设置"
+        android:text="@string/language"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
@@ -84,7 +84,7 @@
         android:gravity="center"
         android:paddingTop="10dp"
         android:textColor="#fff"
-        android:text="自动轮换"
+        android:text="@string/changeDelay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 <LinearLayout
@@ -126,7 +126,7 @@
         app:npv_ItemPaddingHorizontal="5dp"
         app:npv_ItemPaddingVertical="5dp"
         app:npv_TextColorHint="#fff"
-        app:npv_HintText="时"
+        app:npv_HintText="@string/hour"
         app:npv_ShowCount="3"
         app:npv_TextArray="@array/hour"
         app:npv_RespondChangeOnDetached="false"
@@ -146,7 +146,7 @@
         app:npv_ItemPaddingHorizontal="5dp"
         app:npv_ItemPaddingVertical="5dp"
         app:npv_TextColorHint="#fff"
-        app:npv_HintText="分"
+        app:npv_HintText="@string/minute"
         app:npv_ShowCount="3"
         app:npv_TextArray="@array/minute_or_second_display"
         app:npv_RespondChangeOnDetached="false"
@@ -165,7 +165,7 @@
         app:npv_ItemPaddingHorizontal="5dp"
         app:npv_ItemPaddingVertical="5dp"
         app:npv_TextColorHint="#fff"
-        app:npv_HintText="秒"
+        app:npv_HintText="@string/second"
         app:npv_ShowCount="3"
         app:npv_TextArray="@array/minute_or_second_display"
         app:npv_RespondChangeOnDetached="false"

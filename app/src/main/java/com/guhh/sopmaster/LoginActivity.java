@@ -73,15 +73,15 @@ public class LoginActivity extends AppCompatActivity {
                 //验证用户输入的内容是否正确
                 if ("".equals(station)) {
                     station_et.requestFocus();
-                    station_et.setError("请输入工站编号");
+                    station_et.setError(getString(R.string.enter_station_tip));
                 } else if ("".equals(ip)) {
-                    ip_et.setError("请输入IP");
+                    ip_et.setError(getString(R.string.enter_ip_tip));
                     ip_et.requestFocus();
                 } else if (!util.ipCheck(ip)) {
-                    ip_et.setError("IP不合法");
+                    ip_et.setError(getString(R.string.ip_err));
                     ip_et.requestFocus();
                 } else if ("".equals(port)) {
-                    port_et.setError("请输入端口号");
+                    port_et.setError(getString(R.string.enter_port_tip));
                     port_et.requestFocus();
                 } else {//到这里说明用户输入的内容全部正确
 
@@ -101,18 +101,18 @@ public class LoginActivity extends AppCompatActivity {
                         //开启一个线程去登录
                         LoginThread loginThread = new LoginThread();
                         loginThread.execute(ip, port, station);
-                        loading_dialog = CustomProgress.show(LoginActivity.this, "登录中...", false, null);
+                        loading_dialog = CustomProgress.show(LoginActivity.this, getString(R.string.loging), false, null);
                     } else {//没有网络
                         HashMap<String,String> data = util.getLocalLoginData();
                         if(data.get("ip").equals("")){
-                            Toast.makeText(getBaseContext(),"本地没有登录信息，且没有连接到网络，请连接到网络进行登录！",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), R.string.noLoginInfoAndNoNetWorkTIp,Toast.LENGTH_SHORT).show();
 
                         }else{
                             //跳转到界面 在MainActivity开启后台更新文件服务
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
                             LoginActivity.this.finish();
-                            Toast.makeText(getBaseContext(), "没有网络，显示已缓存的文件！", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), R.string.noNetWork, Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -158,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
             station_et.setText(station);
             if (needAutoLogin) {
                 login_btn.performClick();
-                Toast.makeText(getBaseContext(), "已存在登录信息，自动登录", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), R.string.loginInfoExist_AutoLogin, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -220,7 +220,7 @@ public class LoginActivity extends AppCompatActivity {
                 loading_dialog.dismiss();
             }
             if (loginResult == null || loginResult.equals("")) {
-                Toast.makeText(getBaseContext(), "登录失败，服务器返回数据为空！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), R.string.loginErr_resultNull, Toast.LENGTH_SHORT).show();
                 return;
             }
             Log.i(TAG, loginResult);
@@ -237,23 +237,23 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(intent);
                         LoginActivity.this.finish();
                     }else if(result_code.equals("0801")){//登录失败，超过点数
-                        Toast.makeText(getBaseContext(),"登录失败，已经超过点数！",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), R.string.loginErr_OutofPointer,Toast.LENGTH_SHORT).show();
 
                     } else {//登录失败  并提示原因
                         try {
                             String msg = new String(Base64.decodeBase64(results[2].getBytes()));
                             JSONObject root = new JSONObject(msg);
                             String reason = root.getString("msg");
-                            Toast.makeText(getBaseContext(), "登录失败" + reason, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), getString(R.string.loginErr) + reason, Toast.LENGTH_SHORT).show();
                             Log.i("sssddd", reason);
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Toast.makeText(getBaseContext(), "解析json数据错误", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), R.string.pullJsonErr, Toast.LENGTH_SHORT).show();
                         }
 
                     }
                 }else{
-                    Toast.makeText(getBaseContext(), "登录失败，服务器返回数据不正确！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), R.string.loginErr_resultErr, Toast.LENGTH_SHORT).show();
                 }
             }
         }

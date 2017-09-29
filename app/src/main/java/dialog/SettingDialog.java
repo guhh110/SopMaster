@@ -144,7 +144,7 @@ public class SettingDialog extends Dialog {
         languageSet_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Settings.ACTION_INPUT_METHOD_SUBTYPE_SETTINGS);
+                Intent intent = new Intent(Settings.ACTION_LOCALE_SETTINGS  );
                 context.startActivity(intent);
                 dismiss();
             }
@@ -181,7 +181,7 @@ public class SettingDialog extends Dialog {
                         }
                     });
                 }else{
-                    searchFileDialog.setMessage("请插入U盘");
+                    searchFileDialog.setMessage(context.getString(R.string.pushInUDisk));
                     searchFileDialog.show();
                 }
 
@@ -293,7 +293,7 @@ public class SettingDialog extends Dialog {
             String action = intent.getAction();
             Log.i(TAG,action);
             if(action.equals(Intent.ACTION_MEDIA_MOUNTED)){
-                searchFileDialog.setMessage("已检测到U盘！");
+                searchFileDialog.setMessage(context.getString(R.string.checkInUDisk));
                 String path = intent.getDataString();
                 Log.i(TAG,path+"--path");
                 String pathString = path.split("file://")[1] + "/";//U盘路径
@@ -305,19 +305,19 @@ public class SettingDialog extends Dialog {
                 if(newVersionApkInfo != null){
                     String newVersionSopPath = newVersionApkInfo.get("path");
                     String newVersionCode = newVersionApkInfo.get("versionCode");
-                    Toast.makeText(getContext(),"已经找到新版本的SOP，版本号为"+newVersionCode,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(),context.getString(R.string.findNewVersion)+newVersionCode,Toast.LENGTH_SHORT).show();
                     File file = new File(newVersionSopPath);
                     Intent installApkIntent = getApkFileIntent(file);
                     context.startActivity(installApkIntent);
                     searchFileDialog.dismiss();
 
                 }else{
-                    searchFileDialog.setMessage("没有找到新版本的SOPMaster！");
+                    searchFileDialog.setMessage(context.getString(R.string.noNewVersion));
 
                 }
 
             }else if(action.equals(Intent.ACTION_MEDIA_UNMOUNTED)){
-                searchFileDialog.setMessage("U盘已经移除！");
+                searchFileDialog.setMessage(context.getString(R.string.pushOutUDisk));
             }
         }
     }

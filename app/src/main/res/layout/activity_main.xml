@@ -25,7 +25,7 @@
         android:gravity="center"
         android:textSize="28sp"
         android:id="@+id/noPage_tv"
-        android:text="没有发布文档"
+        android:text="@string/noFiles"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/include"

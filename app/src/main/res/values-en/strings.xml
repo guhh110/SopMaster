@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SOPMaster</string>
+    <string name="connectServerSuc">Connection server successful</string>
+    <string name="enter_ip_tip">Please enter IP</string>
+    <string name="enter_port_tip">Please enter the port number</string>
+    <string name="enter_station_tip">请输入工站编号</string>
+    <string name="ip_err">IP is illegal</string>
+    <string name="loginErr">Logon failure</string>
+    <string name="loginErr_OutofPointer">Login failed, more than count!</string>
+    <string name="loginErr_resultErr">Logon failed and server returned data incorrectly!</string>
+    <string name="loginErr_resultNull">Logon failed. Server returned data empty!</string>
+    <string name="loginInfoExist_AutoLogin">Logon information already exists, automatic logon</string>
+    <string name="loging">Log in...</string>
+    <string name="msg">Deny write permission, video and picture will not be cached</string>
+    <string name="needPremission">Video and picture caching requires write access</string>
+    <string name="netWrokConnect_openService">The network is connected to open the background update service!</string>
+    <string name="newFiles">New jobs found are being updated...</string>
+    <string name="no">No</string>
+    <string name="noLoginInfoAndNoNetWorkTIp">There is no logon information locally, and no connection to the network. Please connect to the network to log in!</string>
+    <string name="noNetWork">There is no network to display cached files!</string>
+    <string name="offlineTimeOut">The offline time is running out. Please log in again!</string>
+    <string name="openPerssion">You have banned write permission. Do you want to open now?</string>
+    <string name="otherPointerLogin_Exit">The site logs in elsewhere, and this program will exit to the login screen!</string>
+    <string name="playErr">This type of video is not supported, and the next one is about to be played.</string>
+    <string name="pullJsonErr">Parsing JSON data errors</string>
+    <string name="yes">Yes</string>
+    <string name="login">登录</string>
+    <string name="changeDelay">Switching time</string>
+    <string name="checkInUDisk">The U disk has been detected!</string>
+    <string name="findNewVersion">The new version of SOP has been found, and the version number is</string>
+    <string name="hour">H</string>
+    <string name="ip">IP address:</string>
+    <string name="language">Language</string>
+    <string name="minute">M</string>
+    <string name="netWork">Network</string>
+    <string name="noFiles">No published document</string>
+    <string name="noNewVersion">The new version of SOPMaster was not found!</string>
+    <string name="port">Port number:</string>
+    <string name="pushInUDisk">Please insert the U disk</string>
+    <string name="pushOutUDisk">The U disk has been removed!</string>
+    <string name="second">S</string>
+    <string name="stationNumber">Station number:</string>
+    <string name="timeSet">Time</string>
+    <string name="updateApp">Update Application</string>
+    <string name="wifi">WIFI</string>
+</resources>
