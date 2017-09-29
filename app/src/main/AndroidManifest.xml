@@ -18,12 +18,10 @@
         android:name=".App"
         >
         <activity android:name=".MainActivity"
-            android:screenOrientation="landscape"
             >
 
         </activity>
         <activity android:name=".LoginActivity"
-            android:screenOrientation="landscape"
             >
             <intent-filter>
                 <category android:name="android.intent.category.HOME" />

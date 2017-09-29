@@ -103,12 +103,17 @@ public class LoginActivity extends AppCompatActivity {
                         loginThread.execute(ip, port, station);
                         loading_dialog = CustomProgress.show(LoginActivity.this, "登录中...", false, null);
                     } else {//没有网络
+                        HashMap<String,String> data = util.getLocalLoginData();
+                        if(data.get("ip").equals("")){
+                            Toast.makeText(getBaseContext(),"本地没有登录信息，且没有连接到网络，请连接到网络进行登录！",Toast.LENGTH_SHORT).show();
 
-                        //跳转到界面 在MainActivity开启后台更新文件服务
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        LoginActivity.this.finish();
-                        Toast.makeText(getBaseContext(), "没有网络，显示已缓存的文件！", Toast.LENGTH_SHORT).show();
+                        }else{
+                            //跳转到界面 在MainActivity开启后台更新文件服务
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            LoginActivity.this.finish();
+                            Toast.makeText(getBaseContext(), "没有网络，显示已缓存的文件！", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             }
