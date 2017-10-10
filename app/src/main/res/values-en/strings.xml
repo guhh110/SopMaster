@@ -4,7 +4,7 @@
     <string name="connectServerSuc">Connection server successful</string>
     <string name="enter_ip_tip">Please enter IP</string>
     <string name="enter_port_tip">Please enter the port number</string>
-    <string name="enter_station_tip">请输入工站编号</string>
+    <string name="enter_station_tip">Please enter the station number</string>
     <string name="ip_err">IP is illegal</string>
     <string name="loginErr">Logon failure</string>
     <string name="loginErr_OutofPointer">Login failed, more than count!</string>
@@ -25,7 +25,7 @@
     <string name="playErr">This type of video is not supported, and the next one is about to be played.</string>
     <string name="pullJsonErr">Parsing JSON data errors</string>
     <string name="yes">Yes</string>
-    <string name="login">登录</string>
+    <string name="login">LOGIN</string>
     <string name="changeDelay">Switching time</string>
     <string name="checkInUDisk">The U disk has been detected!</string>
     <string name="findNewVersion">The new version of SOP has been found, and the version number is</string>
