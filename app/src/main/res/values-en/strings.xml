@@ -4,7 +4,7 @@
     <string name="connectServerSuc">Connection server successful</string>
     <string name="enter_ip_tip">Please enter IP</string>
     <string name="enter_port_tip">Please enter the port number</string>
-    <string name="enter_station_tip">Please enter the station number</string>
+    <string name="enter_station_tip">Please enter the station code</string>
     <string name="ip_err">IP is illegal</string>
     <string name="loginErr">Logon failure</string>
     <string name="loginErr_OutofPointer">Login failed, more than count!</string>
@@ -26,22 +26,22 @@
     <string name="pullJsonErr">Parsing JSON data errors</string>
     <string name="yes">Yes</string>
     <string name="login">LOGIN</string>
-    <string name="changeDelay">Switching time</string>
+    <string name="changeDelay">Switching Interval</string>
     <string name="checkInUDisk">The U disk has been detected!</string>
     <string name="findNewVersion">The new version of SOP has been found, and the version number is</string>
     <string name="hour">H</string>
-    <string name="ip">IP address:</string>
+    <string name="ip">IP Address:</string>
     <string name="language">Language</string>
     <string name="minute">M</string>
     <string name="netWork">Network</string>
     <string name="noFiles">No published document</string>
     <string name="noNewVersion">The new version of SOPMaster was not found!</string>
-    <string name="port">Port number:</string>
+    <string name="port">Port Number:</string>
     <string name="pushInUDisk">Please insert the U disk</string>
     <string name="pushOutUDisk">The U disk has been removed!</string>
     <string name="second">S</string>
-    <string name="stationNumber">Station number:</string>
-    <string name="timeSet">Time</string>
-    <string name="updateApp">Update Application</string>
+    <string name="stationNumber">Station Code:</string>
+    <string name="timeSet">Datetime</string>
+    <string name="updateApp">Upgrade</string>
     <string name="wifi">WIFI</string>
 </resources>

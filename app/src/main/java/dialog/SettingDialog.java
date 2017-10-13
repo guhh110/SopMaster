@@ -48,7 +48,7 @@ public class SettingDialog extends Dialog {
     private static String TAG = "SettingDialog";
     private TextView timeSet_tv;
     private TextView wifiSet_tv;
-    private TextView netSet_tv;
+//    private TextView netSet_tv;
     private TextView update_tv;
     private TextView languageSet_tv;
 
@@ -95,7 +95,7 @@ public class SettingDialog extends Dialog {
 
         timeSet_tv = (TextView) findViewById(R.id.timeSet_tv);
         wifiSet_tv = (TextView) findViewById(R.id.wifiSet_tv);
-        netSet_tv = (TextView) findViewById(R.id.netSet_tv);
+//        netSet_tv = (TextView) findViewById(R.id.netSet_tv);
         update_tv = (TextView) findViewById(R.id.updateSet_tv);
         languageSet_tv = (TextView) findViewById(R.id.languageSet_tv);
         hour_npv = (NumberPickerView) findViewById(R.id.hour_npv);
@@ -158,14 +158,14 @@ public class SettingDialog extends Dialog {
                 dismiss();
             }
         });
-        netSet_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
-                context.startActivity(intent);
-                dismiss();
-            }
-        });
+//        netSet_tv.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+//                context.startActivity(intent);
+//                dismiss();
+//            }
+//        });
         update_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
